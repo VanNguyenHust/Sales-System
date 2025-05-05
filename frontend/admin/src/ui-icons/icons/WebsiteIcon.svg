@@ -1,0 +1,59 @@
+<svg
+  width="24"
+  height="24"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 20 20"
+>
+  <defs>
+    <linearGradient
+      id="linear-gradient-icon-web"
+      x1="7.56"
+      y1="4.73"
+      x2="8.72"
+      y2="9.03"
+      gradientTransform="matrix(1, 0, 0, -1, 0, 19.89)"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0" style="stop-color: #e6f8ff"></stop>
+      <stop offset="0.98" style="stop-color: #fff"></stop>
+    </linearGradient>
+    <linearGradient
+      id="linear-gradient-icon-web-2"
+      x1="8.81"
+      y1="4.44"
+      x2="9.97"
+      y2="8.72"
+      xlink:href="#linear-gradient-icon-web"
+    ></linearGradient>
+    <linearGradient
+      id="linear-gradient-icon-web-3"
+      x1="9.16"
+      y1="8.34"
+      x2="11.65"
+      y2="8.34"
+      xlink:href="#linear-gradient-icon-web"
+    ></linearGradient>
+  </defs>
+  <rect width="20" height="20" rx="4" style="fill: #0db473"></rect>
+  <path
+    d="M15.85,5.54a1.37,1.37,0,0,0-1.37-1.37H5.54A1.37,1.37,0,0,0,4.17,5.54v1.3H15.85Z"
+    style="fill: url(#linear-gradient-icon-web)"
+  ></path>
+  <path
+    d="M4.17,14.24a1.59,1.59,0,0,0,1.59,1.59h8.49a1.6,1.6,0,0,0,1.6-1.59V7.6H4.17v6.64Z"
+    style="fill: url(#linear-gradient-icon-web-2)"
+  ></path>
+  <path d="M5.18,5.5a.46.46,0,0,1,.92,0A.47.47,0,0,1,5.64,6,.46.46,0,0,1,5.18,5.5Z" style="fill: #0db473"></path>
+  <path d="M6.78,5.5a.46.46,0,0,1,.91,0,.46.46,0,1,1-.91,0Z" style="fill: #0db473"></path>
+  <path
+    d="M8.87,9.84A.91.91,0,0,0,8,9.14H7.09v.91H8l.52,2.2a.91.91,0,0,0,.89.7h1.8a1.13,1.13,0,0,0,1.06-.8l.68-2h-4Z"
+    style="fill: #0db473"
+  ></path>
+  <path
+    d="M11.65,11.06l-.27.81h0a.22.22,0,0,1-.19.16H9.39l-.23-1Z"
+    style="fill: url(#linear-gradient-icon-web-3)"
+  ></path>
+  <path d="M9.92,13.84a.46.46,0,1,1-.46-.46A.47.47,0,0,1,9.92,13.84Z" style="fill: #0db473"></path>
+  <path d="M11.63,13.84a.47.47,0,0,1-.46.46.46.46,0,0,1,0-.92A.47.47,0,0,1,11.63,13.84Z" style="fill: #0db473"></path>
+</svg>
