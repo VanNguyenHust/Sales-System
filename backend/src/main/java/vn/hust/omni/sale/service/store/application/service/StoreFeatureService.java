@@ -2,6 +2,7 @@ package vn.hust.omni.sale.service.store.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import vn.hust.omni.sale.service.store.application.constant.StoreFeatures;
 import vn.hust.omni.sale.service.store.application.model.store_features.StoreFeaturesResponse;
 import vn.hust.omni.sale.service.store.domain.model.StoreFeature;
 import vn.hust.omni.sale.service.store.domain.repository.JpaStoreFeatureRepository;
@@ -30,6 +31,15 @@ public class StoreFeatureService {
     }
 
     public void enable(int storeId, String featureKey) {
+        if (StoreFeatures.getStoreFeatures().keySet().stream().noneMatch(featureKey::equals)) {
+            throw new ConstraintViolationException(
+                    UserError.builder()
+                            .message("Tính năng không tồn tại.")
+                            .fields(List.of("featureKey"))
+                            .build()
+            );
+        }
+
         if (!storeRepository.existsById(storeId)) {
             throw new ConstraintViolationException(
                     UserError.builder()

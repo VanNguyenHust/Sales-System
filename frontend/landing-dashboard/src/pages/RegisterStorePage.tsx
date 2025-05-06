@@ -201,7 +201,7 @@ const RegisterStorePage: React.FC = () => {
                       }}
                     >
                       {provinces.map((p) => (
-                        <Option key={p.label} value={p.label}>
+                        <Option key={p.key} value={p.key}>
                           {p.label}
                         </Option>
                       ))}

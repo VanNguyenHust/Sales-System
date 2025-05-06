@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -17,31 +18,20 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class ObjectMapperConfig {
-    @Bean(name = "json_without_root")
-    @Primary
-    public ObjectMapper jsonWithoutRoot() {
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(Instant.class, new CustomInstantSerializer())
-                .addDeserializer(Instant.class, new CustomInstantDeserializer());
-        return new ObjectMapper()
-                .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .registerModule(javaTimeModule);
-    }
 
-    @Bean(name = "json_with_root")
-    public ObjectMapper jsonWithRoot() {
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(Instant.class, new CustomInstantSerializer())
-                .addDeserializer(Instant.class, new CustomInstantDeserializer());
-        return new ObjectMapper()
-                .configure(SerializationFeature.WRAP_ROOT_VALUE, true)
-                .configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true)
-                .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .registerModule(javaTimeModule);
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+        ObjectMapper mapper = builder.createXmlMapper(false).build();
+
+        JavaTimeModule module = new JavaTimeModule();
+        module.addSerializer(Instant.class, new CustomInstantSerializer());
+        module.addDeserializer(Instant.class, new CustomInstantDeserializer());
+
+        mapper.registerModule(module);
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        return mapper;
     }
 
     public static class CustomInstantSerializer extends JsonSerializer<Instant> {

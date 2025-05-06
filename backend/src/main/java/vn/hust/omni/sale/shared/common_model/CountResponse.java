@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonRootName("_") //noroot
+@JsonRootName("_")
 public class CountResponse {
     private long count;
 }

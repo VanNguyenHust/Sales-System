@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import vn.hust.omni.sale.service.store.application.model.store.EnableStoreRequest;
 import vn.hust.omni.sale.service.store.application.model.store.RegisterStoreRequest;
+import vn.hust.omni.sale.service.store.application.model.store.administrator.StoreResponse;
 import vn.hust.omni.sale.service.store.application.service.StoreService;
 
 @RestController

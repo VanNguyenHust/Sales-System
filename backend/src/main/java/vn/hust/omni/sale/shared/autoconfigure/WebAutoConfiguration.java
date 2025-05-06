@@ -1,11 +1,8 @@
 package vn.hust.omni.sale.shared.autoconfigure;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
@@ -14,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -23,7 +20,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import vn.hust.omni.sale.shared.bind.ParamNameServletModelAttributeResolver;
 import vn.hust.omni.sale.shared.common_util.DateUtils;
 import vn.hust.omni.sale.shared.common_util.EnumUtils;
-import vn.hust.omni.sale.shared.common_util.JsonUtils;
 import vn.hust.omni.sale.shared.common_validator.exception.DefaultExceptionHandlerAdvice;
 import vn.hust.omni.sale.shared.common_validator.exception.DefaultExceptionHandlerAdviceConfig;
 
@@ -33,21 +29,12 @@ import java.util.Date;
 import java.util.List;
 
 @Configuration
-@ConditionalOnClass({RootAwareMappingJackson2HttpMessageConverter.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureBefore(HttpMessageConvertersAutoConfiguration.class)
 public class WebAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        return new RootAwareMappingJackson2HttpMessageConverter(JsonUtils.createObjectMapper()
-                .enable(SerializationFeature.WRAP_ROOT_VALUE)
-                .enable(DeserializationFeature.UNWRAP_ROOT_VALUE));
-    }
-
-    @Bean
-//    @ConditionalOnMissingBean(annotation = ControllerAdvice.class)
+    @ConditionalOnMissingBean(annotation = ControllerAdvice.class)
     public DefaultExceptionHandlerAdvice defaultExceptionHandlerAdvice() {
         return new DefaultExceptionHandlerAdvice();
     }

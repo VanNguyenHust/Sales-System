@@ -101,8 +101,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/healthcheck/health", "GET"),
                 Pair.of("/actuator/**", "GET"),
 
+                Pair.of("/administrator/**", "GET"),
+                Pair.of("/administrator/**", "POST"),
+                Pair.of("/administrator/**", "PUT"),
+                Pair.of("/administrator/**", "DELETE"),
+
                 Pair.of("/admin/store/register", "POST"),
-                Pair.of("/administrator/store_feature/**", "PUT"),
                 Pair.of("/admin/store/enable", "PUT"),
                 Pair.of("/admin/user/login", "POST"),
 

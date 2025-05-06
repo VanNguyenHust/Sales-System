@@ -9,6 +9,7 @@ public class LoginResponse {
     private String token;
     private String refreshToken;
     private int storeId;
+    private String storeAlias;
     private long resourceId;
     private String resourceType;
 }

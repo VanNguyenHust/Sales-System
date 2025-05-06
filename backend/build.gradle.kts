@@ -27,6 +27,7 @@ dependencies {
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.0")
 	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 	annotationProcessor("org.projectlombok:lombok:1.18.34")
+	annotationProcessor ("org.hibernate.orm:hibernate-jpamodelgen")
 
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -42,6 +43,7 @@ dependencies {
 	implementation("jakarta.validation:jakarta.validation-api:3.1.0")
 	implementation("com.fasterxml.jackson.core:jackson-core:2.18.2")
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2")
 	implementation("com.google.guava:guava:32.1.2-jre")
 	implementation("commons-validator:commons-validator:1.7")
 	implementation("com.googlecode.libphonenumber:libphonenumber:8.13.30")

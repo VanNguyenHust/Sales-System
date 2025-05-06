@@ -2,7 +2,11 @@ package vn.hust.omni.sale.service.store.interfaces;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import vn.hust.omni.sale.service.store.application.model.store.administrator.FilterStoresRequest;
 import vn.hust.omni.sale.service.store.application.model.store.administrator.OpenLimitStoreRequest;
+import vn.hust.omni.sale.service.store.application.model.store.administrator.StoreResponse;
+import vn.hust.omni.sale.service.store.application.model.store.administrator.StoresResponse;
+import vn.hust.omni.sale.service.store.application.model.store_features.StoreFeaturesResponse;
 import vn.hust.omni.sale.service.store.application.service.StoreFeatureService;
 import vn.hust.omni.sale.service.store.application.service.StoreService;
 
@@ -28,8 +32,23 @@ public class AdministratorController {
         storeService.openLimitStore(storeId, request);
     }
 
+    @GetMapping("/store/{storeId}/features")
+    public StoreFeaturesResponse getStoreFeatures(@PathVariable int storeId) {
+        return storeFeatureService.get(storeId);
+    }
+
     @DeleteMapping
     public void disableStore(@RequestParam int storeId) {
         storeService.disableStore(storeId);
+    }
+
+    @GetMapping("/store")
+    public StoresResponse get(FilterStoresRequest request) {
+        return storeService.administratorGet(request);
+    }
+
+    @GetMapping("/store/{storeId}")
+    public StoreResponse getById(@PathVariable int storeId) {
+        return storeService.getById(storeId);
     }
 }

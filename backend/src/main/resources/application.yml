@@ -21,11 +21,6 @@ spring:
           auth: true
           starttls:
             enable: true
-  jackson:
-    serialization:
-      wrap-root-value: true
-    deserialization:
-      unwrap-root-value: true
 
 token:
   jwt:
