@@ -1,7 +1,7 @@
+import { NotFoundPage } from "@/components/ErrorBoundary";
 import { JSX } from "react";
 import { useParams } from "react-router-dom";
 
-import { NotFoundPage } from "src/components/ErrorBoundary";
 import { ValidateParamOptions } from "src/types/routes";
 
 interface Props {

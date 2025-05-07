@@ -9,7 +9,7 @@ public class LoginResponse {
     private String token;
     private String refreshToken;
     private int storeId;
-    private String storeAlias;
+    private String domain;
     private long resourceId;
     private String resourceType;
 }

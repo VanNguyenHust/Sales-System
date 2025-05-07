@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import vn.hust.omni.sale.service.metafield.application.model.metafieldefinition.MetafieldDefinitionCreateRequest;
 import vn.hust.omni.sale.service.metafield.application.model.metafieldefinition.MetafieldDefinitionResponse;
+import vn.hust.omni.sale.service.metafield.application.model.metafieldefinition.MetafieldDefinitionUpdateRequest;
 import vn.hust.omni.sale.service.metafield.application.service.definition.MetafieldDefinitionService;
 import vn.hust.omni.sale.service.store.application.constant.StoreFeatures;
 import vn.hust.omni.sale.service.store.application.service.StoreFeatureService;
@@ -38,5 +39,13 @@ public class MetafieldDefinitionController {
         checkFeatureAccessMetafieldDefinition(storeId);
 
         return metafieldDefinitionService.add(storeId, model);
+    }
+
+    @PutMapping
+    public MetafieldDefinitionResponse update(
+            @StoreId int storeId, @Valid @RequestBody MetafieldDefinitionUpdateRequest model) {
+        checkFeatureAccessMetafieldDefinition(storeId);
+
+        return metafieldDefinitionService.update(storeId, model);
     }
 }

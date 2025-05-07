@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 
-import { routes as adminRoutes } from "src/features/admin/routes";
+import { routes as adminRoutes } from "@/features/admin/routes";
 
 import { OopsPage } from "./components/ErrorBoundary";
 import { App } from "./App";

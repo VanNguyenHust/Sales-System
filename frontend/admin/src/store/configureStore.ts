@@ -1,9 +1,9 @@
 import { configureStore as reduxConfigureStore } from "@reduxjs/toolkit";
 
-import { adminApi } from "app/api";
-import { IS_PROD } from "app/constants";
-import { rootReducer } from "app/state/rootReducer";
-import { StoreState } from "app/types/store";
+import { adminApi } from "@/api";
+import { IS_PROD } from "@/constants";
+import { rootReducer } from "@/state/rootReducer";
+import { StoreState } from "@/types/store";
 
 import { setStore } from "./store";
 

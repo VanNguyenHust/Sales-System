@@ -32,8 +32,4 @@ public class Metafield {
     private Instant createdOn;
     @UpdateTimestamp
     private Instant modifiedOn;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "definitionId")
-    private MetafieldDefinition definition;
 }

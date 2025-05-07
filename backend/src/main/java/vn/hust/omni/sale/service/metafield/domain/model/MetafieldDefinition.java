@@ -63,12 +63,6 @@ public class MetafieldDefinition {
     @Builder.Default
     private List<MetafieldDefinitionValidation> validations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "definition", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    @Builder.Default
-    private List<Metafield> metafields = new ArrayList<>();
-
     public List<MetafieldDefinitionValidation> getValidations() {
         return List.copyOf(validations);
     }

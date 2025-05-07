@@ -1,4 +1,5 @@
 import { TableColumnsType } from "antd";
+import { provinces } from "../constants/province";
 
 export type FilterStoresRequest = {
   query?: string;
@@ -52,6 +53,8 @@ export const columnsStore: TableColumnsType<StoreResponse> = [
     title: "Tỉnh thành",
     dataIndex: "province",
     key: "province",
+    render: (province: string) =>
+      provinces.find((item) => item.key === province)?.label,
   },
   {
     title: "Email",

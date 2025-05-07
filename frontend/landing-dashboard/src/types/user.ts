@@ -7,7 +7,7 @@ export type LoginResponse = {
   token: string;
   refreshToken: string;
   storeId: number;
-  storeAlias: string;
+  domain: string;
   resourceId: number;
   resourceType: string;
 };
