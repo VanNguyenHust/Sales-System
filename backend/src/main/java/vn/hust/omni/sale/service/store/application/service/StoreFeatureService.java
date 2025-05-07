@@ -30,6 +30,18 @@ public class StoreFeatureService {
                 .build();
     }
 
+    public Boolean isFeatureEnabled(int storeId, String featureKey) {
+        var storeFeature = storeFeatureRepository.findByStoreIdAndFeatureKey(storeId, featureKey)
+                .orElseThrow(() -> new ConstraintViolationException(
+                        UserError.builder()
+                                .message("Tính năng không tồn tại.")
+                                .fields(List.of("featureKey"))
+                                .build()
+                ));
+
+        return storeFeature.isEnable();
+    }
+
     public void enable(int storeId, String featureKey) {
         if (StoreFeatures.getStoreFeatures().keySet().stream().noneMatch(featureKey::equals)) {
             throw new ConstraintViolationException(
