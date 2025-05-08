@@ -48,4 +48,16 @@ public class MetafieldDefinitionController {
 
         return metafieldDefinitionService.update(storeId, model);
     }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void remove(
+            @StoreId int storeId,
+            @PathVariable("id") int id,
+            @RequestParam(name = "delete_all_associated_metafields", defaultValue = "false")
+            boolean deleteAllAssociatedMetafields) {
+        checkFeatureAccessMetafieldDefinition(storeId);
+
+        metafieldDefinitionService.remove(storeId, id, deleteAllAssociatedMetafields);
+    }
 }

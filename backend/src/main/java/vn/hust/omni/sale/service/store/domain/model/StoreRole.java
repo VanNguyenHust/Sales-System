@@ -10,7 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
-import vn.hust.omni.sale.service.store.infrastructure.persistence.StringListJoinAttributeConverter;
+import vn.hust.omni.sale.shared.persistence.StringListJoinAttributeConverter;
 
 import java.time.Instant;
 import java.util.List;

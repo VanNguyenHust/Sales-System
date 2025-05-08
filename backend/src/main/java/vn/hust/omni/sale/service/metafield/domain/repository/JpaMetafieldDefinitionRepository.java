@@ -12,4 +12,6 @@ public interface JpaMetafieldDefinitionRepository extends JpaRepository<Metafiel
     Optional<MetafieldDefinition> findByStoreIdAndKeyAndNamespaceAndOwnerResource(int storeId, String key,
                                                                                   String namespace,
                                                                                   MetafieldDefinitionOwnerType ownerResource);
+
+    Optional<MetafieldDefinition> findByStoreIdAndId(int storeId, int id);
 }

@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
@@ -16,6 +17,8 @@ import vn.hust.omni.sale.service.metafield.application.service.metafield.Metafie
 import vn.hust.omni.sale.service.metafield.domain.model.MetafieldDefinition;
 import vn.hust.omni.sale.service.metafield.domain.model.MetafieldDefinitionOwnerType;
 import vn.hust.omni.sale.service.metafield.domain.repository.JpaMetafieldDefinitionRepository;
+import vn.hust.omni.sale.service.metafield.domain.repository.JpaMetafieldValidateInvalidRepository;
+import vn.hust.omni.sale.shared.common_util.JsonUtils;
 import vn.hust.omni.sale.shared.common_validator.exception.ErrorMessage;
 import vn.hust.omni.sale.shared.common_validator.exception.NotFoundException;
 import vn.hust.omni.sale.shared.common_validator.exception.ConstraintViolationException;
@@ -32,8 +35,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MetafieldDefinitionService {
     private final JpaMetafieldDefinitionRepository metafieldDefinitionRepository;
+    private final JpaMetafieldValidateInvalidRepository metafieldValidateInvalidRepository;
     private final MetafieldUtils metafieldUtils;
     private final TransactionTemplate transactionTemplate;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     private final ObjectMapper json;
     private final MetafieldDefinitionMapper metafieldDefinitionMapper;
@@ -100,6 +106,30 @@ public class MetafieldDefinitionService {
         Assert.notNull(result, "result must not be null");
 
         return metafieldDefinitionMapper.toResponse(result);
+    }
+
+    public void remove(int storeId, int id, boolean deleteAllAssociatedMetafields) {
+        var result = transactionTemplate.execute(status -> {
+            var definition = metafieldDefinitionRepository.findByStoreIdAndId(storeId, id)
+                    .orElseThrow(NotFoundException::new);
+            metafieldUtils.checkDeletePermission(definition.getOwnerResource());
+            metafieldDefinitionRepository.delete(definition);
+            metafieldValidateInvalidRepository.deleteByStoreIdAndDefinitionId(storeId, definition.getId());
+            return definition;
+        });
+        if (result != null) {
+            eventPublisher.publishEvent(MetafieldDefinitionLog.builder()
+                    .id(result.getId())
+                    .storeId(result.getStoreId())
+                    .name(result.getName())
+                    .namespace(result.getNamespace())
+                    .key(result.getKey())
+                    .type(result.getType())
+                    .ownerResource(result.getOwnerResource().name())
+                    .verb(MetafieldDefinitionLog.Verb.DELETE)
+                    .deleteAllAssociatedMetafields(deleteAllAssociatedMetafields)
+                    .build());
+        }
     }
 
     private void validateDefinitionLimit(int storeId) {
