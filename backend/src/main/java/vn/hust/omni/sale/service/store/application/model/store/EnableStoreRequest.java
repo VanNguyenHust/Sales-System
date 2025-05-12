@@ -6,7 +6,6 @@ import lombok.Data;
 
 @Data
 @Builder
-@JsonRootName("enable")
 public class EnableStoreRequest {
     private String confirmCode;
     private String name;

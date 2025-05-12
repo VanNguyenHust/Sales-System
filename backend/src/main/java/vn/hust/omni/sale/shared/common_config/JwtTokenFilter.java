@@ -6,12 +6,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import vn.hust.omni.sale.service.store.domain.model.User;
 import vn.hust.omni.sale.service.store.domain.repository.JpaUserRepository;
 import vn.hust.omni.sale.shared.common_model.ResourceType;
 
@@ -73,10 +76,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                var accountModel = accountModelOptional.get();
+                var accountModel = (User) accountModelOptional.get();
                 if (jwtTokenUtil.validateToken(token, accountModel)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            accountModel, null);
+                            accountModel,
+                            null,
+                            Arrays.stream(StringUtils.split(accountModel.getPermissions(), ","))
+                                    .map(permission -> new SimpleGrantedAuthority("ROLE_" + permission))
+                                    .toList()
+                    );
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 } else {

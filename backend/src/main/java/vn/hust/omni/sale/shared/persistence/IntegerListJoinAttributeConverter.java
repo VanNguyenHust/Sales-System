@@ -1,4 +1,4 @@
-package vn.hust.omni.sale.service.store.infrastructure.persistence;
+package vn.hust.omni.sale.shared.persistence;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

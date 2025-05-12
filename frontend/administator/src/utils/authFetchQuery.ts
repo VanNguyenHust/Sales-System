@@ -6,7 +6,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { camelizeKeys } from "humps";
 
-const rawBaseQuery = fetchBaseQuery({ baseUrl: "http://localhost:8080" });
+const rawBaseQuery = fetchBaseQuery({ baseUrl: "http://localhost:8088" });
 
 export const authFetchBaseQuery: BaseQueryFn<
   string | FetchArgs,

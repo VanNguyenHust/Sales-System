@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-import { adminApi } from "src/api";
-import { TenantState } from "app/types";
-import { UIState } from "app/types/ui";
+import { adminApi } from "@/api";
+import { TenantState } from "@/types";
+import { UIState } from "@/types/ui";
 
 export const initialTenantState: TenantState = {
   initializing: 3,

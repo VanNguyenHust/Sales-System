@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Input, Button, Typography, Row, Col } from "antd";
+import { Form, Input, Button, Typography, Row, Col, notification } from "antd";
 import {
   EyeInvisibleOutlined,
   EyeTwoTone,
@@ -12,18 +12,42 @@ import { useLoginStoreMutation } from "../api";
 const { Title, Text } = Typography;
 
 const LoginStorePage: React.FC = () => {
+  const [api, contextHolder] = notification.useNotification();
   const [formLogin] = Form.useForm<LoginRequest>();
 
   const [login, { isLoading: isLogin }] = useLoginStoreMutation();
 
+  const openNotification = ({
+    title,
+    description,
+    type = "info",
+  }: {
+    title: string;
+    description: string;
+    type?: "success" | "error" | "info" | "warning";
+  }) => {
+    api.open({
+      type,
+      message: title,
+      description: description,
+      showProgress: true,
+      duration: 3,
+    });
+  };
+
   const handleLogin = async (values: LoginRequest) => {
     try {
       const response = await login(values).unwrap();
-      console.log("Login successful:", response);
-      // Handle successful login (e.g., redirect to dashboard)
+      window.location.href =
+        "http://localhost:5173/admin?authorize=" + response.token;
     } catch (error) {
-      console.error("Login failed:", error);
-      // Handle login error (e.g., show error message)
+      openNotification({
+        type: "error",
+        title: "Đăng ký cửa hàng thất bại",
+        description:
+          (error as any)?.data?.errors?.[0]?.message ||
+          "Đã xảy ra lỗi không xác định",
+      });
     }
   };
 
@@ -38,6 +62,7 @@ const LoginStorePage: React.FC = () => {
         position: "relative",
       }}
     >
+      {contextHolder}
       <Col
         xs={22}
         sm={20}

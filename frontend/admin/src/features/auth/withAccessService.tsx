@@ -1,9 +1,11 @@
+import { AccessDeniedPage } from "@/components/ErrorBoundary";
+import { UnSupportPackagePage } from "@/components/ErrorBoundary";
+import { useSelector } from "@/types";
+import { FeatureFlag } from "@/utils/useFeatureFlag";
+import { useFeatureFlag } from "@/utils/useFeatureFlag";
 import { ComponentType } from "react";
 
-import { AccessDeniedPage, UnSupportPackagePage } from "src/components/ErrorBoundary";
-import { useSelector } from "src/types";
 import { RouteMetadata } from "src/types/routes";
-import { FeatureFlag, useFeatureFlag } from "src/utils/useFeatureFlag";
 
 // eslint-disable-next-line react/display-name
 const withAccessService = (Component: ComponentType) => (routeMetadata: RouteMetadata) => {

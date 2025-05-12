@@ -3,7 +3,6 @@ import { isArray } from "lodash-es";
 
 import { AccessDeniedPage, NotFoundPage } from "src/components/ErrorBoundary";
 import { LegacyPage } from "src/components/Legacy/LegacyPage";
-import { routes as appRoutes } from "src/features/app/routes";
 import { FeatureFlag, FeatureFlags, useFeatureFlag } from "src/utils/useFeatureFlag";
 
 import { RouteDescriptor } from "@/types/routes";

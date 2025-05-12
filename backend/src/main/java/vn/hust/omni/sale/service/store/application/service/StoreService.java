@@ -208,6 +208,18 @@ public class StoreService {
                 .build();
     }
 
+    public StoreResponse getStoreById(int storeId) {
+        var store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new ConstraintViolationException(
+                        UserError.builder()
+                                .message("Cửa hàng không tồn tại.")
+                                .fields(List.of("storeId"))
+                                .build()
+                ));
+
+        return storeMapper.toResponse(store);
+    }
+
     private Specification<Store> buildSpecification(String query, String province, Integer status) {
         Specification<Store> specification = Specification.where(null);
 

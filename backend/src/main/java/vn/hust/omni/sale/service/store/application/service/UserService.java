@@ -94,7 +94,7 @@ public class UserService {
                 .token(tokenModel.getToken())
                 .refreshToken(tokenModel.getRefreshToken())
                 .storeId(store.getId())
-                .storeAlias(store.getAlias())
+                .domain(store.getDomain())
                 .resourceId(user.getId())
                 .resourceType(ResourceType.STORE.name())
                 .build();

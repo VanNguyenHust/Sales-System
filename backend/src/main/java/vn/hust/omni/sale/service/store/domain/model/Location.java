@@ -1,9 +1,10 @@
 package vn.hust.omni.sale.service.store.domain.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
@@ -12,10 +13,13 @@ import java.time.Instant;
 @Entity
 @Table(name = "Locations")
 @DynamicUpdate
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
     private int storeId;
     private String code;
     private String name;
@@ -33,8 +37,23 @@ public class Location {
     private String wardCode;
     private String address1;
 
-    private Instant startDate;
-    private Instant endDate;
+    private boolean deleted;
+    private boolean inventoryManagement;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @CreationTimestamp
     private Instant createdOn;
+    @UpdateTimestamp
     private Instant modifiedOn;
+
+    public Location(int id, int storeId, String code) {
+        this.id = id;
+        this.code = code;
+        this.storeId = storeId;
+    }
+
+    public enum Status {
+        active, expired
+    }
 }
