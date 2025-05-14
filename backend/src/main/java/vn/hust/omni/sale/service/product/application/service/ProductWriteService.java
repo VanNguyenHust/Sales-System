@@ -81,8 +81,7 @@ public class ProductWriteService {
     }
 
     @Transactional
-    public void updateProduct(int productId, int storeId, ProductRequest productRequest)
-            throws IOException, ExecutionException, InterruptedException {
+    public void updateProduct(int productId, int storeId, ProductRequest productRequest) {
         var product = productRepository.getByIdAndStoreId(productId, storeId);
         if (product == null) throw new NotFoundException("product not exists");
         if (Optional.ofNullable(productRequest.getName()).isPresent())
@@ -102,6 +101,19 @@ public class ProductWriteService {
 
         if (!productRequest.getTags().isEmpty()) {
             product.setTags(mapProductTags(productRequest.getTags()));
+        } else {
+            product.setTags(Set.of());
+        }
+
+        if (!productRequest.getInventories().isEmpty()) {
+            var inventories = mapInventoryLevels(productId, productRequest.getInventories());
+            inventoryRepository.saveAll(inventories);
+        }
+
+        if (!productRequest.getImages().isEmpty()) {
+            product.setImages(mapProductImages(productRequest.getImages()));
+        } else {
+            product.setImages(List.of());
         }
 
         var images = mapProductImages(productRequest.getImages());

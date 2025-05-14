@@ -57,6 +57,7 @@ public class Product {
     @Embedded
     private ProductPricingInfo pricingInfo = new ProductPricingInfo();
 
+    @Setter
     @Valid
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductImage> images = new ArrayList<>();

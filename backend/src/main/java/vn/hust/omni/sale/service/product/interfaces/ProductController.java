@@ -35,14 +35,14 @@ public class ProductController {
         return productReadService.getById(storeId, id);
     }
 
-//    @PutMapping(value = "/{id}")
-//    public ProductResponse productUpdate(@PathVariable("id") int id, @RequestBody @Valid ProductRequest model, @StoreId int storeId) {
-//        var metafieldResults = validateAndGenerateMetafields(model.getMetafields(), storeId, MetafieldDefinitionOwnerType.product, id);
-//        productWriteService.updateProduct(id, storeId, model);
-//        if (metafieldResults != null) metafieldService.save(metafieldResults, productId.getId());
-//        return productReadService.getById(productId.getStoreId(), productId.getId());
-//
-//    }
+    @PutMapping(value = "/{id}")
+    public ProductResponse productUpdate(@PathVariable("id") int id, @RequestBody @Valid ProductRequest model, @StoreId int storeId) {
+        var metafieldResults = validateAndGenerateMetafields(model.getMetafields(), storeId, MetafieldDefinitionOwnerType.product, id);
+        productWriteService.updateProduct(id, storeId, model);
+        if (metafieldResults != null) metafieldService.save(metafieldResults, id);
+        return productReadService.getById(storeId, id);
+
+    }
 
     private List<Metafield> validateAndGenerateMetafields(List<MetafieldRequest> metafieldRequests,
                                                           int storeId,

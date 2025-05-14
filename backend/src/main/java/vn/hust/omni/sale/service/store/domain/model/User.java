@@ -66,7 +66,7 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String permissions;
 
-    @StringInList(array = {"regular", "invited", "requested", "collaborator"})
+    @StringInList(array = {"active", "invited", "requested", "collaborator"})
     private String userType;
 
     private boolean active;

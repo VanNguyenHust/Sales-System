@@ -5,6 +5,10 @@ import vn.hust.omni.sale.service.store.domain.model.Store;
 import vn.hust.omni.sale.service.store.domain.model.Store_;
 
 public class StoreSpecification {
+    public static Specification<Store> filterStoreTrash() {
+        return (root, query, cb) -> cb.and(cb.equal(root.get(Store_.STATUS), 0));
+    }
+
     public static Specification<Store> hasName(String name) {
         return (root, query, cb) -> cb.like(root.get(Store_.NAME), "%" + name + "%");
     }

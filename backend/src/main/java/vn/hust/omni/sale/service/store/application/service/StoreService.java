@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import vn.hust.omni.sale.service.store.application.model.user.CreateUserAccountR
 import vn.hust.omni.sale.service.store.application.service.mapper.StoreMapper;
 import vn.hust.omni.sale.service.store.domain.model.Store;
 import vn.hust.omni.sale.service.store.domain.model.Store_;
+import vn.hust.omni.sale.service.store.domain.model.User;
 import vn.hust.omni.sale.service.store.domain.repository.JpaStoreRepository;
 import vn.hust.omni.sale.service.store.domain.repository.JpaUserRepository;
 import vn.hust.omni.sale.service.store.infrastructure.specification.StoreSpecification;
@@ -28,6 +30,7 @@ import vn.hust.omni.sale.shared.common_validator.exception.ConstraintViolationEx
 import vn.hust.omni.sale.shared.common_validator.exception.UserError;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -92,11 +95,8 @@ public class StoreService {
                 .phoneNumber(request.getPhone())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .build());
-
-        eventPublisher.publishEvent(InitStoreFeaturesEvent.builder()
-                .storeId(store.getId())
-                .build());
+                .build()
+        );
     }
 
     @Transactional
@@ -144,9 +144,16 @@ public class StoreService {
 
         ownerAccount.setActive(true);
         ownerAccount.setPassword(passwordEncoder.encode(ownerAccount.getPasswordSalt() + request.getPassword()));
+        ownerAccount.setUserType("active");
+        ownerAccount.setConfirmCode(null);
+        ownerAccount.setConfirmCodeExpirationDate(null);
 
         storeRepository.save(store);
         userRepository.save(ownerAccount);
+
+        eventPublisher.publishEvent(InitStoreFeaturesEvent.builder()
+                .storeId(store.getId())
+                .build());
     }
 
     @Transactional
@@ -178,6 +185,25 @@ public class StoreService {
 
         store.setDeleted(true);
         storeRepository.save(store);
+    }
+
+    @Scheduled(fixedDelay = 15000)
+    public void scheduledDeleteStore() {
+        var storesTrashSpecification = StoreSpecification.filterStoreTrash();
+        var storesTrash = storeRepository.findAll(storesTrashSpecification);
+
+        var storesDelete = new ArrayList<Store>();
+        var ownerAccountsDelete = new ArrayList<User>();
+        storesTrash.forEach(store -> {
+            var storeOwner = userRepository.findOwnerAccount(store.getId());
+            if (storeOwner.getConfirmCodeExpirationDate().isBefore(Instant.now())) {
+                storesDelete.add(store);
+                ownerAccountsDelete.add(storeOwner);
+            }
+        });
+
+        userRepository.deleteAll(ownerAccountsDelete);
+        storeRepository.deleteAll(storesDelete);
     }
 
     public StoreResponse getById(int storeId) {

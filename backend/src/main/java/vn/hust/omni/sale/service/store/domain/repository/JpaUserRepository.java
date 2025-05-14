@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.hust.omni.sale.service.store.domain.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface JpaUserRepository extends JpaRepository<User, Integer> {
@@ -16,4 +17,6 @@ public interface JpaUserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT u FROM User u WHERE u.storeId = :storeId AND u.accountOwner = true")
     User findOwnerAccount(@Param("storeId") int storeId);
+
+    List<User> findAllByStoreId(int storeId);
 }
