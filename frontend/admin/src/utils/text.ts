@@ -17,7 +17,11 @@ export type IsSearchTextMatchOptions = {
   vietnamese?: boolean;
 };
 
-export function isSearchTextMatch(text: string, query: string, options?: IsSearchTextMatchOptions): boolean {
+export function isSearchTextMatch(
+  text: string,
+  query: string,
+  options?: IsSearchTextMatchOptions
+): boolean {
   const setting: IsSearchTextMatchOptions = {
     caseSensitive: false,
     prefix: false,
@@ -33,7 +37,9 @@ export function isSearchTextMatch(text: string, query: string, options?: IsSearc
       text = normalizeVietnamese(text, options);
       query = normalizeVietnamese(query, options);
     } else {
-      const options: NormalizeVietnameseOptions = { transformType: "tone_mark" };
+      const options: NormalizeVietnameseOptions = {
+        transformType: "tone_mark",
+      };
       text = normalizeVietnamese(text, options);
       query = normalizeVietnamese(query, options);
     }
@@ -118,22 +124,37 @@ const viMarkDict = Object.keys(viInitialMarkDict).reduce((acc, key) => {
 }, {} as Dict);
 const viMarkRegexStr = Object.keys(viMarkDict).join("|");
 
-export function normalizeVietnamese(str: string, options?: NormalizeVietnameseOptions) {
+export function normalizeVietnamese(
+  str: string,
+  options?: NormalizeVietnameseOptions
+) {
   let result = nfcNormalize(str);
-  if (options?.transformType === "tone" || options?.transformType === "tone_mark") {
-    result = result.replace(new RegExp(viToneRegexStr, "g"), (matched) => viToneDict[matched]);
+  if (
+    options?.transformType === "tone" ||
+    options?.transformType === "tone_mark"
+  ) {
+    result = result.replace(
+      new RegExp(viToneRegexStr, "g"),
+      (matched) => viToneDict[matched]
+    );
   }
   if (options?.transformType === "tone_mark") {
-    result = result.replace(new RegExp(viMarkRegexStr, "g"), (matched) => viMarkDict[matched]);
+    result = result.replace(
+      new RegExp(viMarkRegexStr, "g"),
+      (matched) => viMarkDict[matched]
+    );
   }
   return result;
 }
 
-export const encodeCommaString = (text: string, type: "encode" | "decode" = "encode") => {
+export const encodeCommaString = (
+  text: string,
+  type: "encode" | "decode" = "encode"
+) => {
   if (type === "encode") {
-    return text.replaceAll(/,/g, "&comma;");
+    return text.replace(/,/g, "&comma;");
   } else {
-    return text.replaceAll(/&comma;/g, ",");
+    return text.replace(/&comma;/g, ",");
   }
 };
 
@@ -142,4 +163,13 @@ function nfcNormalize(s: string) {
     return s.normalize();
   }
   return s;
+}
+
+export function safeJSONParse(jsonString: string) {
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.log("safeJSONParse error", error);
+    return undefined;
+  }
 }

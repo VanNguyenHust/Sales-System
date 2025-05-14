@@ -1,5 +1,9 @@
 {
 	"dependencies": {
+		"humps": "^2.0.1",
 		"react-helmet-async": "^2.0.5"
+	},
+	"devDependencies": {
+		"@types/humps": "^2.0.6"
 	}
 }
