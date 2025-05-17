@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 public enum Role {
     store_settings,
+    user_settings,
     location_settings,
     read_customers,
     create_customers,

@@ -59,6 +59,33 @@ public class UserService {
                 .build();
     }
 
+    public UserResponse getUserById(int storeId, int userId) {
+        var user = userRepository.findByStoreIdAndId(storeId, userId)
+                .orElseThrow(() -> new ConstraintViolationException(
+                        UserError.builder()
+                                .message("Tài khoản không tồn tại.")
+                                .fields(List.of("userId"))
+                                .build()
+                ));
+
+        return userMapper.toResponse(user);
+    }
+
+    public UserResponse getUserByToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var principal = authentication.getPrincipal();
+        if (!(authentication.getPrincipal() instanceof User)) {
+            throw new ConstraintViolationException(
+                    UserError.builder()
+                            .message("Tài khoản không tồn tại.")
+                            .fields(List.of("token"))
+                            .build()
+            );
+        }
+
+        return userMapper.toResponse((User) principal);
+    }
+
     public void createOwnerAccount(int storeId, CreateUserAccountRequest request) {
         validateExistingEmail(storeId, request.getEmail());
 
@@ -307,6 +334,43 @@ public class UserService {
                 .resourceId(user.getId())
                 .resourceType(ResourceType.STORE.name())
                 .build();
+    }
+
+    public void updateUserAccount(int storeId, UpdateUserAccountRequest request) {
+        var user = getUserByAuthentication();
+
+        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+            validateExistingEmail(storeId, request.getEmail());
+            user.setEmail(request.getEmail());
+        }
+
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+
+        userRepository.save(user);
+    }
+
+    private User getUserByAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof User) {
+            return (User) authentication.getPrincipal();
+        } else {
+            throw new ConstraintViolationException(
+                    UserError.builder()
+                            .message("Tài khoản không tồn tại.")
+                            .fields(List.of("token"))
+                            .build()
+            );
+        }
     }
 
     private void verifyPasswordAuthentication(String email, String password, String passwordSalt) {

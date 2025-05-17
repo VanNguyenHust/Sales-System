@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { getMenuKeys, menuItems } from "../types/sider";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { getMenuKeys, menuItemsTop, menuItemsBottom } from "@/types/sider";
+import { ProfileMenu } from "@/components/ProfileMenu";
 
 const { Header, Content, Sider } = Layout;
 
@@ -11,20 +12,19 @@ export const LayoutComponent: React.FC = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
-
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
   useEffect(() => {
     if (location.pathname === "/") {
-      navigate("/dashboard", { replace: true });
+      navigate("/admin/dashboard", { replace: true });
     }
   }, [location.pathname, navigate]);
 
   const { selectedKey, openKeys: calculatedOpenKeys } = getMenuKeys(
     location.pathname,
-    menuItems
+    menuItemsTop.concat(menuItemsBottom)
   );
 
   const handleOpenChange = (keys: string[]) => {
@@ -32,32 +32,48 @@ export const LayoutComponent: React.FC = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "100vh", backgroundColor: "#333334" }}>
       <Sider
         width={200}
         collapsed={collapsed}
         onCollapse={setCollapsed}
         breakpoint="lg"
-        collapsedWidth="0"
+        collapsedWidth="60"
         style={{
           position: "fixed",
           left: 0,
           top: 0,
           bottom: 0,
           overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
         }}
       >
-        <div className="demo-logo-vertical"></div>
         <Menu
           theme="dark"
           mode="inline"
           defaultSelectedKeys={
-            menuItems[0]?.key ? [menuItems[0].key as string] : []
+            menuItemsTop[0]?.key ? [menuItemsTop[0].key as string] : []
           }
+          inlineCollapsed={collapsed}
           selectedKeys={[selectedKey]}
           openKeys={openKeys.length ? openKeys : calculatedOpenKeys}
           onOpenChange={handleOpenChange}
-          items={menuItems}
+          items={menuItemsTop}
+          onClick={({ key }) => navigate(key)}
+        />
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={
+            menuItemsBottom[0]?.key ? [menuItemsBottom[0].key as string] : []
+          }
+          inlineCollapsed={collapsed}
+          selectedKeys={[selectedKey]}
+          openKeys={openKeys.length ? openKeys : calculatedOpenKeys}
+          onOpenChange={handleOpenChange}
+          items={menuItemsBottom}
           onClick={({ key }) => navigate(key)}
         />
       </Sider>
@@ -69,7 +85,7 @@ export const LayoutComponent: React.FC = () => {
           style={{
             position: "fixed",
             top: 0,
-            left: collapsed ? 0 : 200,
+            left: collapsed ? 60 : 200,
             right: 0,
             height: "64px",
             background: colorBgContainer,
@@ -87,7 +103,7 @@ export const LayoutComponent: React.FC = () => {
           >
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </span>
-          {/* <ProfileMenu /> */}
+          <ProfileMenu />
         </Header>
 
         <Content
@@ -95,11 +111,12 @@ export const LayoutComponent: React.FC = () => {
             marginTop: "64px",
             padding: "24px 16px",
             overflowY: "auto",
+            marginLeft: collapsed ? 60 : 0,
+            transition: "margin-left 0.2s",
           }}
         >
           <div
             style={{
-              padding: "8px 24px",
               gap: "16px",
               height: "100%",
               background: colorBgContainer,

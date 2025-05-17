@@ -12,11 +12,13 @@ import java.time.Instant;
 public class StoreResponse {
     private int id;
     private String name;
-    private String province;
     private String phoneNumber;
     private String email;
     private int status;
     private String storeOwner;
+    private String countryCode;
+    private String provinceCode;
+    private String address;
     private int maxProduct;
     private Integer maxLocation;
     private Integer maxUser;

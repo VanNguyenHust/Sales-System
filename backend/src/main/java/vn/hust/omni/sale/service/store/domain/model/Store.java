@@ -69,9 +69,6 @@ public class Store {
     @Length(max = 10)
     private String provinceCode;
 
-    @Length(max = 10)
-    private String currency;
-
     @NotNull
     private int status;
 

@@ -17,6 +17,16 @@ public class UserController {
         return userService.get(storeId);
     }
 
+    @GetMapping("/current")
+    public UserResponse getUserByToken() {
+        return userService.getUserByToken();
+    }
+
+    @GetMapping("/{userId}")
+    public UserResponse getUserById(@StoreId int storeId, @PathVariable int userId) {
+        return userService.getUserById(storeId, userId);
+    }
+
     @PostMapping
     public void createUserAccount(@StoreId int storeId, CreateUserAccountRequest request) {
         userService.createUserAccount(storeId, request);
@@ -40,6 +50,11 @@ public class UserController {
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
         return userService.login(request);
+    }
+
+    @PutMapping
+    public void updateUserAccount(@StoreId int storeId, @RequestBody UpdateUserAccountRequest request) {
+        userService.updateUserAccount(storeId, request);
     }
 
     @PutMapping("/disable/{userId}")

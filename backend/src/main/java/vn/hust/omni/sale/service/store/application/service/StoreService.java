@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.hust.omni.sale.service.store.application.model.store.EnableStoreRequest;
 import vn.hust.omni.sale.service.store.application.model.store.RegisterStoreRequest;
+import vn.hust.omni.sale.service.store.application.model.store.UpdateStoreRequest;
 import vn.hust.omni.sale.service.store.application.model.store.administrator.FilterStoresRequest;
 import vn.hust.omni.sale.service.store.application.model.store.administrator.OpenLimitStoreRequest;
 import vn.hust.omni.sale.service.store.application.model.store.administrator.StoreResponse;
@@ -79,7 +80,7 @@ public class StoreService {
                 .phoneNumber(request.getPhone())
                 .createdOn(Instant.now())
                 .country("Việt Nam")
-                .province(request.getProvince())
+                .provinceCode(request.getProvince())
                 .storeOwner(request.getFirstName() + " " + request.getLastName())
                 .startDate(Instant.now())
                 .endDate(Instant.now().plusSeconds(60 * 60 * 24 * 30))
@@ -204,6 +205,42 @@ public class StoreService {
 
         userRepository.deleteAll(ownerAccountsDelete);
         storeRepository.deleteAll(storesDelete);
+    }
+
+    public void updateStore(int storeId, UpdateStoreRequest request) {
+        var store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new ConstraintViolationException(
+                        UserError.builder()
+                                .message("Cửa hàng không tồn tại.")
+                                .fields(List.of("storeId"))
+                                .build()
+                ));
+
+        if (request.getName() != null) {
+            store.setName(request.getName());
+        }
+
+        if (request.getPhoneNumber() != null) {
+            store.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        if (request.getEmail() != null) {
+            store.setEmail(request.getEmail());
+        }
+
+        if (request.getCountryCode() != null) {
+            store.setCountryCode(request.getCountryCode());
+        }
+
+        if (request.getProvinceCode() != null) {
+            store.setProvinceCode(request.getProvinceCode());
+        }
+
+        if (request.getAddress() != null) {
+            store.setAddress(request.getAddress());
+        }
+
+        storeRepository.save(store);
     }
 
     public StoreResponse getById(int storeId) {

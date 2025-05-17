@@ -1,68 +1,32 @@
+import { authFetchBaseQuery } from "@/utils/authFetchQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
-
-import { authFetchBaseQuery } from "./utils/authFetchQuery";
-import { StoreFeaturesResponse } from "./types/store_features";
+import { CountryResponse, ProvinceResponse } from "./types/address";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: authFetchBaseQuery,
-  tagTypes: ["store", "store_feature"],
+  tagTypes: ["country"],
   endpoints: (builder) => ({
-    getStores: builder.query<StoresResponse, FilterStoresRequest>({
-      query: (params) => ({
-        url: "/administrator/store",
-        method: "GET",
-        params,
-      }),
-      providesTags: ["store"],
-      transformResponse: (response: StoresResponse) => ({
-        stores: response.stores,
-        count: response.count,
-      }),
-    }),
-    getStoreById: builder.query<StoreResponse, { storeId: number }>({
-      query: ({ storeId }) => ({
-        url: `/administrator/store/${storeId}`,
+    getCountries: builder.query<CountryResponse[], void>({
+      query: () => ({
+        url: "/admin/location/countries",
         method: "GET",
       }),
-      providesTags: ["store"],
+      providesTags: ["country"],
+      transformResponse: (response: CountryResponse[]) => response,
     }),
-    getStoreFeatures: builder.query<StoreFeaturesResponse, { storeId: number }>(
-      {
-        query: ({ storeId }) => ({
-          url: `/administrator/store/${storeId}/features`,
-          method: "GET",
-        }),
-        providesTags: ["store_feature"],
-      }
-    ),
-    enableStoreFeature: builder.mutation<
-      void,
-      { storeId: number; featureKey: string }
-    >({
-      query: ({ storeId, featureKey }) => ({
-        url: `/administrator/store_feature/${storeId}/enable/${featureKey}`,
-        method: "PUT",
+    getProvinces: builder.query<ProvinceResponse[], void>({
+      query: () => ({
+        url: `/admin/location/provinces`,
+        method: "GET",
       }),
-      invalidatesTags: ["store_feature"],
-    }),
-    disableStoreFeature: builder.mutation<
-      void,
-      { storeId: number; featureKey: string }
-    >({
-      query: ({ storeId, featureKey }) => ({
-        url: `/administrator/store_feature/${storeId}/disable/${featureKey}`,
-        method: "PUT",
-      }),
-      invalidatesTags: ["store_feature"],
+      providesTags: ["country"],
+      transformResponse: (response: ProvinceResponse[]) => response,
     }),
   }),
 });
 
 export const {
-  useGetStoresQuery,
-  useGetStoreByIdQuery,
-  useGetStoreFeaturesQuery,
-  useEnableStoreFeatureMutation,
-  useDisableStoreFeatureMutation,
+    useGetCountriesQuery,
+    useGetProvincesQuery,
 } = adminApi;

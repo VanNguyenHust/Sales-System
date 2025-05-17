@@ -13,7 +13,7 @@ export const authFetchBaseQuery: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("admin_token");
 
   const tokenHeader = {
     Authorization: `Bearer ${token}`,
