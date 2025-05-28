@@ -8,5 +8,7 @@ import lombok.Data;
 public class SendInvitedManageStore {
     private String email;
     private String fullName;
+    private String storeName;
+    private String storeId;
     private String confirmCode;
 }

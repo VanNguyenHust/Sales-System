@@ -24,6 +24,5 @@ public class LocationCreateRequest {
     private Optional<@Size(max = 50) String> districtCode;
     private Optional<@Size(max = 50) String> wardCode;
     private Optional<@Size(max = 255) String> address1;
-    private Boolean inventoryManagement;
     private Boolean defaultLocation;
 }

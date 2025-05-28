@@ -1,5 +1,6 @@
 package vn.hust.omni.sale.service.product.interfaces;
 
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,8 @@ import vn.hust.omni.sale.service.metafield.domain.model.Metafield;
 import vn.hust.omni.sale.service.metafield.domain.model.MetafieldDefinitionOwnerType;
 import vn.hust.omni.sale.service.product.application.model.ProductRequest;
 import vn.hust.omni.sale.service.product.application.model.ProductResponse;
+import vn.hust.omni.sale.service.product.application.model.ProductSearchRequest;
+import vn.hust.omni.sale.service.product.application.model.ProductsResponse;
 import vn.hust.omni.sale.service.product.application.service.ProductReadService;
 import vn.hust.omni.sale.service.product.application.service.ProductWriteService;
 import vn.hust.omni.sale.shared.security.StoreId;
@@ -35,13 +38,23 @@ public class ProductController {
         return productReadService.getById(storeId, id);
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping("/{id}")
     public ProductResponse productUpdate(@PathVariable("id") int id, @RequestBody @Valid ProductRequest model, @StoreId int storeId) {
         var metafieldResults = validateAndGenerateMetafields(model.getMetafields(), storeId, MetafieldDefinitionOwnerType.product, id);
         productWriteService.updateProduct(id, storeId, model);
         if (metafieldResults != null) metafieldService.save(metafieldResults, id);
         return productReadService.getById(storeId, id);
+    }
 
+    @GetMapping(value = "/search")
+    @Timed(percentiles = {0.95}, histogram = true)
+    public ProductsResponse productSearch(ProductSearchRequest model, @StoreId int storeId) {
+        return productReadService.search(storeId, model);
+    }
+
+    @GetMapping("/{id}")
+    public ProductResponse productGetById(@PathVariable("id") int id, @StoreId int storeId) {
+        return productReadService.getById(storeId, id);
     }
 
     private List<Metafield> validateAndGenerateMetafields(List<MetafieldRequest> metafieldRequests,

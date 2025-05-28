@@ -19,6 +19,6 @@ public class MetafieldDefinitionResponse {
     private boolean pin;
     private int metafieldsCount;
     private int invalidMetafieldsCount;
-//    private List<MetafieldDefinitionValidationResponse> validations;
+    private List<MetafieldDefinitionValidationResponse> validations;
 //    private MetafieldDefinitionValidationStatus validationStatus;
 }

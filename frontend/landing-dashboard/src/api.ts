@@ -39,6 +39,35 @@ export const adminApi = createApi({
       },
       transformResponse: (response: LoginResponse) => response,
     }),
+    confirmInvited: builder.mutation<
+      string,
+      { email: string; storeId: number; confirmCode: string }
+    >({
+      query: ({ email, storeId, confirmCode }) => ({
+        url: `/admin/user/confirm_invited?email=${email}&storeId=${storeId}&confirmCode=${confirmCode}`,
+        method: "PUT",
+        responseHandler: "text",
+      }),
+      invalidatesTags: ["store"],
+      transformResponse: (response: string) => response,
+    }),
+    resetPassword: builder.mutation<
+      void,
+      {
+        storeId: number;
+        email: string;
+        tokenCode: string;
+        newPassword: string;
+        confirmPassword: string;
+      }
+    >({
+      query: ({ storeId, email, tokenCode, newPassword, confirmPassword }) => ({
+        url: `/admin/user/reset_password`,
+        method: "PUT",
+        body: { storeId, email, tokenCode, newPassword, confirmPassword },
+      }),
+      invalidatesTags: ["store"],
+    }),
   }),
 });
 
@@ -46,4 +75,6 @@ export const {
   useRegisterStoreMutation,
   useEnableStoreMutation,
   useLoginStoreMutation,
+  useConfirmInvitedMutation,
+  useResetPasswordMutation,
 } = adminApi;

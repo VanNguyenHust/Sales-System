@@ -117,6 +117,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/admin/store/register", "POST"),
                 Pair.of("/admin/store/enable", "PUT"),
                 Pair.of("/admin/user/login", "POST"),
+                Pair.of("/admin/user/confirm_invited", "PUT"),
+                Pair.of("/admin/user/reset_password", "PUT"),
 
                 // OpenAPI requests, no JWT token required
                 Pair.of("/v3/api-docs/**", "GET"),

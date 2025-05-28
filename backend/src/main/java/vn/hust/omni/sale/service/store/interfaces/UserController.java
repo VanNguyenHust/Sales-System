@@ -6,6 +6,8 @@ import vn.hust.omni.sale.service.store.application.model.user.*;
 import vn.hust.omni.sale.service.store.application.service.UserService;
 import vn.hust.omni.sale.shared.security.StoreId;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/admin/user")
 @RequiredArgsConstructor
@@ -28,13 +30,13 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUserAccount(@StoreId int storeId, CreateUserAccountRequest request) {
+    public void createUserAccount(@StoreId int storeId, @RequestBody CreateUserAccountRequest request) {
         userService.createUserAccount(storeId, request);
     }
 
     @PutMapping("/confirm_invited")
-    public String confirmLinkInvited(int storeId, String email) {
-        return userService.confirmLinkInvited(storeId, email);
+    public String confirmLinkInvited(int storeId, String email, String confirmCode) {
+        return userService.confirmLinkInvited(storeId, email, confirmCode);
     }
 
     @PutMapping("/reset_password")
@@ -57,18 +59,23 @@ public class UserController {
         userService.updateUserAccount(storeId, request);
     }
 
-    @PutMapping("/disable/{userId}")
-    public void disableAccount(@StoreId int storeId, @PathVariable int userId) {
-        userService.disableAccount(storeId, userId);
+    @PutMapping("/{userId}")
+    public void adminUpdateUserAccount(@StoreId int storeId, @PathVariable int userId, @RequestBody UpdateUserAccountRequest request) {
+        userService.adminUpdateUserAccount(storeId, userId, request);
     }
 
-    @PutMapping("/enable/{userId}")
-    public void enableAccount(@StoreId int storeId, @PathVariable int userId) {
-        userService.enableAccount(storeId, userId);
+    @PutMapping("/disable")
+    public void disableAccount(@StoreId int storeId, @RequestParam List<Integer> userIds) {
+        userService.disableAccount(storeId, userIds);
     }
 
-    @DeleteMapping("/delete/{userId}")
-    public void deleteAccount(@StoreId int storeId, @PathVariable int userId) {
-        userService.deleteAccount(storeId, userId);
+    @PutMapping("/enable")
+    public void enableAccount(@StoreId int storeId, @RequestParam List<Integer> userIds) {
+        userService.enableAccount(storeId, userIds);
+    }
+
+    @DeleteMapping("/delete")
+    public void deleteAccount(@StoreId int storeId, @RequestParam List<Integer> userIds) {
+        userService.deleteAccount(storeId, userIds);
     }
 }

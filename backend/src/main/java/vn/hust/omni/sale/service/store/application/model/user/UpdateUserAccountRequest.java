@@ -10,4 +10,5 @@ public class UpdateUserAccountRequest {
     private String phoneNumber;
     private String firstName;
     private String lastName;
+    private String permissions;
 }

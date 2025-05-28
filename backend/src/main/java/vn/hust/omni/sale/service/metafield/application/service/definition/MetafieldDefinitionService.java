@@ -23,6 +23,7 @@ import vn.hust.omni.sale.service.metafield.domain.model.MetafieldValidateInvalid
 import vn.hust.omni.sale.service.metafield.domain.repository.JpaMetafieldDefinitionRepository;
 import vn.hust.omni.sale.service.metafield.domain.repository.JpaMetafieldValidateInvalidRepository;
 import vn.hust.omni.sale.service.metafield.infrastructure.specification.MetafieldDefinitionSpecification;
+import vn.hust.omni.sale.shared.common_model.CountResponse;
 import vn.hust.omni.sale.shared.common_validator.exception.ErrorMessage;
 import vn.hust.omni.sale.shared.common_validator.exception.NotFoundException;
 import vn.hust.omni.sale.shared.common_validator.exception.ConstraintViolationException;
@@ -125,6 +126,22 @@ public class MetafieldDefinitionService {
             });
         }
         return metafieldDefinitionResponses;
+    }
+
+    public MetafieldDefinitionResponse getById(int storeId, int id, boolean checkPermission) {
+        var definition = metafieldDefinitionRepository.findOneWithValidations(storeId, id)
+                .orElseThrow(NotFoundException::new);
+        if (checkPermission) metafieldUtils.checkReadPermission(definition.getOwnerResource());
+        var response = metafieldDefinitionMapper.toResponse(definition);
+        var metafieldCounts = metafieldService.filterCountByNamespaceAndKeyAndOwnerResource(storeId, definition.getNamespace(), definition.getKey(), definition.getOwnerResource());
+        var invalidMetafieldsCount = metafieldValidateInvalidRepository.countByStoreIdAndDefinitionId(storeId, id);
+        response.setMetafieldsCount(metafieldCounts);
+        response.setInvalidMetafieldsCount(invalidMetafieldsCount);
+        return response;
+    }
+
+    public CountResponse count(int storeId, MetafieldDefinitionFilterRequest request) {
+        return new CountResponse(metafieldDefinitionRepository.count(MetafieldDefinitionSpecification.ofFilter(storeId, request)));
     }
 
     public MetafieldDefinitionResponse add(int storeId, MetafieldDefinitionCreateRequest request) {
@@ -238,6 +255,16 @@ public class MetafieldDefinitionService {
         var metafieldDefinitionFilters = metafieldDefinitionMapper.fromEntitysToMetafieldDefinitionFilters(metafieldDefinitions);
         metafieldDefinitionFilters.forEach(this::setValueMetafieldDefinitionFilters);
         return metafieldDefinitionFilters;
+    }
+
+    public List<MetafieldDefinitionCountResponse> countByResource(int storeId) {
+        var counts = metafieldDefinitionRepository.countByOwnerResource(storeId);
+        var countMap = counts.stream()
+                .collect(Collectors.toMap(MetafieldDefinitionCount::getOwnerResource, MetafieldDefinitionCount::getCount));
+
+        return Arrays.stream(MetafieldDefinitionOwnerType.values())
+                .map(ownerType -> new MetafieldDefinitionCountResponse(countMap.getOrDefault(ownerType.name(), 0), ownerType.name()))
+                .toList();
     }
 
     private void setValueMetafieldDefinitionFilters(MetafieldDefinitionFilterResponse response) {

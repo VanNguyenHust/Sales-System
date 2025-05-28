@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import vn.hust.omni.sale.service.metafield.application.model.metafield.MetafieldResponse;
 import vn.hust.omni.sale.service.metafield.application.model.metafield.MetafieldSet;
 import vn.hust.omni.sale.service.metafield.application.service.metafield.MetafieldService;
-import vn.hust.omni.sale.service.product.application.model.ProductFilterRequest;
+import vn.hust.omni.sale.service.product.application.model.ProductSearchRequest;
 import vn.hust.omni.sale.service.product.application.service.ProductReadService;
 import vn.hust.omni.sale.service.store.application.model.store.administrator.StoreResponse;
 import vn.hust.omni.sale.service.store.application.service.StoreService;
@@ -27,7 +27,7 @@ public class ApiClient {
         return metafieldService.sets(storeId, metafields);
     }
 
-    public long filterCountProduct(int storeId, ProductFilterRequest filter) {
-        return productReadService.count(storeId, filter);
+    public long filterCountProduct(int storeId, ProductSearchRequest request) {
+        return productReadService.count(storeId, request);
     }
 }

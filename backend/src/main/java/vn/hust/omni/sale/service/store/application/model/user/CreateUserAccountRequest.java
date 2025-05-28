@@ -10,7 +10,5 @@ public class CreateUserAccountRequest {
     private String phoneNumber;
     private String firstName;
     private String lastName;
-    private boolean accountOwner;
-    private long storeRoleId;
     private String permissions;
 }

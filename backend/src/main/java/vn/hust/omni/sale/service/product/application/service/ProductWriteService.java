@@ -15,12 +15,11 @@ import vn.hust.omni.sale.shared.common_util.OptionalUtils;
 import vn.hust.omni.sale.shared.common_util.TextUtils;
 import vn.hust.omni.sale.shared.common_validator.exception.ConstraintViolationException;
 import vn.hust.omni.sale.shared.common_validator.exception.NotFoundException;
+import vn.hust.omni.sale.shared.common_validator.exception.UserError;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +39,7 @@ public class ProductWriteService {
         }
 
         var store = apiClient.storeGetById(storeId);
-        var productCount = apiClient.filterCountProduct(storeId, new ProductFilterRequest());
+        var productCount = apiClient.filterCountProduct(storeId, new ProductSearchRequest());
         if (productCount >= store.getMaxProduct()) {
             throw new ConstraintViolationException("product_quantity", "maximum is " + store.getMaxProduct());
         }
@@ -48,7 +47,10 @@ public class ProductWriteService {
         var productId = transactionTemplate.execute(status -> {
             productRepository.findByAliasAndStoreId(TextUtils.toAlias(OptionalUtils.getValue(productRequest.getName())), storeId)
                     .ifPresent(product -> {
-                        throw new ConstraintViolationException("alias", "must be unique");
+                        throw new ConstraintViolationException(UserError.builder()
+                                .message("Tên sản phẩm đã tồn tại")
+                                .fields(List.of("name"))
+                                .build());
                     });
 
             var images = mapProductImages(productRequest.getImages());
@@ -99,18 +101,18 @@ public class ProductWriteService {
             product.setUnit(productRequest.getUnit().orElse(""));
         }
 
-        if (!productRequest.getTags().isEmpty()) {
+        if (productRequest.getTags() != null && !productRequest.getTags().isEmpty()) {
             product.setTags(mapProductTags(productRequest.getTags()));
         } else {
             product.setTags(Set.of());
         }
 
-        if (!productRequest.getInventories().isEmpty()) {
+        if (productRequest.getInventories() != null && !productRequest.getInventories().isEmpty()) {
             var inventories = mapInventoryLevels(productId, productRequest.getInventories());
             inventoryRepository.saveAll(inventories);
         }
 
-        if (!productRequest.getImages().isEmpty()) {
+        if (product.getImages() != null && !productRequest.getImages().isEmpty()) {
             product.setImages(mapProductImages(productRequest.getImages()));
         } else {
             product.setImages(List.of());
@@ -125,6 +127,9 @@ public class ProductWriteService {
     }
 
     private List<ProductImage> mapProductImages(List<ProductImageRequest> images) {
+        if (images == null || images.isEmpty()) {
+            return List.of();
+        }
         return images.stream()
                 .map(image -> ProductImage.builder()
                         .alt(OptionalUtils.getValue(image.getAlt()))
@@ -135,12 +140,18 @@ public class ProductWriteService {
     }
 
     private Set<ProductTag> mapProductTags(List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return Set.of();
+        }
         return tags.stream()
                 .map(tagName -> new ProductTag(tagName, TextUtils.toAlias(tagName)))
                 .collect(Collectors.toSet());
     }
 
     private ProductPricingInfo mapProductPricingInfo(ProductPricingInfoRequest pricingInfo) {
+        if (pricingInfo == null) {
+            return ProductPricingInfo.builder().build();
+        }
         return ProductPricingInfo.builder()
                 .price(pricingInfo.getPrice())
                 .compareAtPrice(pricingInfo.getCompareAtPrice())
@@ -149,6 +160,9 @@ public class ProductWriteService {
     }
 
     private List<InventoryLevel> mapInventoryLevels(int productId, List<InventoryRequest> inventory) {
+        if (inventory == null || inventory.isEmpty()) {
+            return List.of();
+        }
         return inventory.stream()
                 .map(inventoryRequest -> InventoryLevel.builder()
                         .storeId(inventoryRequest.getStoreId())

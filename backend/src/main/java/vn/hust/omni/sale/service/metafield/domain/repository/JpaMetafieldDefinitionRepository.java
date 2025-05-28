@@ -5,6 +5,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import vn.hust.omni.sale.service.metafield.application.model.metafieldefinition.MetafieldDefinitionCount;
 import vn.hust.omni.sale.service.metafield.domain.model.MetafieldDefinition;
 import vn.hust.omni.sale.service.metafield.domain.model.MetafieldDefinitionOwnerType;
 import vn.hust.omni.sale.service.metafield.infrastructure.specification.MetafieldDefinitionSpecification;
@@ -24,6 +25,9 @@ public interface JpaMetafieldDefinitionRepository extends JpaRepository<Metafiel
 
     Optional<MetafieldDefinition> findByStoreIdAndId(int storeId, int id);
 
+    @Query("from MetafieldDefinition md left join fetch md.validations where md.storeId = :storeId and md.id = :id")
+    Optional<MetafieldDefinition> findOneWithValidations(int storeId, int id);
+
     MetafieldDefinition findByNamespaceAndKeyAndOwnerResourceAndStoreId(String namespace, String key,
                                                                                   MetafieldDefinitionOwnerType ownerResource,
                                                                                   int storeId);
@@ -38,6 +42,11 @@ public interface JpaMetafieldDefinitionRepository extends JpaRepository<Metafiel
                 .sorted(Comparator.comparing((a) -> ids.indexOf(a.getId())))
                 .collect(Collectors.toList());
     }
+
+    @Query(value = "SELECT COUNT(md.id) AS count, md.owner_resource AS ownerResource " +
+                   "FROM metafield_definitions md WHERE md.store_id = :storeId GROUP BY md.owner_resource",
+            nativeQuery = true)
+    List<MetafieldDefinitionCount> countByOwnerResource(int storeId);
 
     default List<MetafieldDefinition> findByValidations(int storeId, MetafieldDefinitionOwnerType ownerResource) {
         var items = findAll(Specification.where(MetafieldDefinitionSpecification.hasStoreId(storeId))
@@ -58,4 +67,5 @@ public interface JpaMetafieldDefinitionRepository extends JpaRepository<Metafiel
 
     List<MetafieldDefinition> findAll(Specification<MetafieldDefinition> spec);
 
+    long count(Specification<MetafieldDefinition> specification);
 }

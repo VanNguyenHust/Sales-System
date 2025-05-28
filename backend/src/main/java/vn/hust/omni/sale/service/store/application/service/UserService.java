@@ -112,13 +112,21 @@ public class UserService {
         var sendConfirmLinkInvitedEvent = SendInvitedManageStore.builder()
                 .email(request.getEmail())
                 .fullName(request.getFirstName() + " " + request.getLastName())
+                .storeName(storeRepository.findById(storeId)
+                        .orElseThrow(() -> new ConstraintViolationException(
+                                UserError.builder()
+                                        .message("Cửa hàng không tồn tại.")
+                                        .fields(List.of("storeId"))
+                                        .build()
+                        )).getName())
+                .storeId(String.valueOf(storeId))
                 .confirmCode(user.getConfirmCode())
                 .build();
 
         eventPublisher.publishEvent(sendConfirmLinkInvitedEvent);
     }
 
-    public String confirmLinkInvited(int storeId, String email) {
+    public String confirmLinkInvited(int storeId, String email, String confirmCode) {
         var user = userRepository.findByStoreIdAndEmail(storeId, email)
                 .orElseThrow(() -> new ConstraintViolationException(
                         UserError.builder()
@@ -127,8 +135,19 @@ public class UserService {
                                 .build()
                 ));
 
-        verifyActiveAccount(user);
+        if (!user.getConfirmCode().equals(confirmCode)) {
+            throw new ConstraintViolationException(
+                    UserError.builder()
+                            .message("Mã xác nhận không đúng.")
+                            .fields(List.of("tokenCode"))
+                            .build()
+            );
+        }
 
+        verifyExpiredConfirmCode(user);
+
+        user.setActive(true);
+        user.setUserType("collaborator");
         user.setConfirmCode(UUID.randomUUID().toString().substring(0, 6));
         user.setConfirmCodeExpirationDate(Instant.now().plusSeconds(60 * 5));
 
@@ -160,6 +179,7 @@ public class UserService {
         verifyExpiredConfirmCode(user);
 
         user.setPassword(passwordEncoder.encode(user.getPasswordSalt() + request.getNewPassword()));
+        clearConfirmCode(user);
 
         userRepository.save(user);
     }
@@ -186,54 +206,62 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void disableAccount(int storeId, int userId) {
-        verifyPermissions(List.of(
-                new SimpleGrantedAuthority("ROLE_store_settings")
-        ));
+    public void disableAccount(int storeId, List<Integer> userIds) {
+        userIds.forEach(userId -> {
+            verifyPermissions(List.of(
+                    new SimpleGrantedAuthority("ROLE_store_settings")
+            ));
 
-        var user = userRepository.findByStoreIdAndId(storeId, userId)
-                .orElseThrow(() -> new ConstraintViolationException(
-                        UserError.builder()
-                                .message("Tài khoản không tồn tại.")
-                                .fields(List.of("userId"))
-                                .build()
-                ));
+            var user = userRepository.findByStoreIdAndId(storeId, userId)
+                    .orElseThrow(() -> new ConstraintViolationException(
+                            UserError.builder()
+                                    .message("Tài khoản không tồn tại.")
+                                    .fields(List.of("userId"))
+                                    .build()
+                    ));
 
-        user.setActive(false);
-        userRepository.save(user);
+            user.setActive(false);
+            userRepository.save(user);
+        });
+
     }
 
-    public void enableAccount(int storeId, int userId) {
-        verifyPermissions(List.of(
-                new SimpleGrantedAuthority("ROLE_store_settings")
-        ));
+    public void enableAccount(int storeId, List<Integer> userIds) {
+        userIds.forEach(userId -> {
+            verifyPermissions(List.of(
+                    new SimpleGrantedAuthority("ROLE_store_settings")
+            ));
 
-        var user = userRepository.findByStoreIdAndId(storeId, userId)
-                .orElseThrow(() -> new ConstraintViolationException(
-                        UserError.builder()
-                                .message("Tài khoản không tồn tại.")
-                                .fields(List.of("userId"))
-                                .build()
-                ));
+            var user = userRepository.findByStoreIdAndId(storeId, userId)
+                    .orElseThrow(() -> new ConstraintViolationException(
+                            UserError.builder()
+                                    .message("Tài khoản không tồn tại.")
+                                    .fields(List.of("userId"))
+                                    .build()
+                    ));
 
-        user.setActive(true);
-        userRepository.save(user);
+            user.setActive(true);
+            userRepository.save(user);
+        });
     }
 
-    public void deleteAccount(int storeId, int userId) {
-        verifyPermissions(List.of(
-                new SimpleGrantedAuthority("ROLE_store_settings")
-        ));
+    public void deleteAccount(int storeId, List<Integer> userIds) {
+        userIds.forEach(userId -> {
+            verifyPermissions(List.of(
+                    new SimpleGrantedAuthority("ROLE_store_settings")
+            ));
 
-        var user = userRepository.findByStoreIdAndId(storeId, userId)
-                .orElseThrow(() -> new ConstraintViolationException(
-                        UserError.builder()
-                                .message("Tài khoản không tồn tại.")
-                                .fields(List.of("userId"))
-                                .build()
-                ));
+            var user = userRepository.findByStoreIdAndId(storeId, userId)
+                    .orElseThrow(() -> new ConstraintViolationException(
+                            UserError.builder()
+                                    .message("Tài khoản không tồn tại.")
+                                    .fields(List.of("userId"))
+                                    .build()
+                    ));
 
-        userRepository.delete(user);
+            userRepository.delete(user);
+        });
+
     }
 
     private void verifyPermissions(List<SimpleGrantedAuthority> permissionNeeds) {
@@ -264,10 +292,10 @@ public class UserService {
     }
 
     private void verifyActiveAccount(User user) {
-        if (user.isActive()) {
+        if (!user.isActive()) {
             throw new ConstraintViolationException(
                     UserError.builder()
-                            .message("Tài khoản đã được kích hoạt.")
+                            .message("Tài khoản chưa được kích hoạt.")
                             .fields(List.of("email"))
                             .build()
             );
@@ -283,6 +311,11 @@ public class UserService {
                             .build()
             );
         }
+    }
+
+    private void clearConfirmCode(User user) {
+        user.setConfirmCode(null);
+        user.setConfirmCodeExpirationDate(null);
     }
 
     private User initUserModel(int storeId, CreateUserAccountRequest request, boolean isOwner) {
@@ -354,6 +387,43 @@ public class UserService {
 
         if (request.getLastName() != null) {
             user.setLastName(request.getLastName());
+        }
+
+        if (request.getPermissions() != null) {
+            user.setPermissions(request.getPermissions());
+        }
+
+        userRepository.save(user);
+    }
+
+    public void adminUpdateUserAccount(int storeId, int userId, UpdateUserAccountRequest request) {
+        var user = userRepository.findByStoreIdAndId(storeId, userId)
+                .orElseThrow(() -> new ConstraintViolationException(
+                        UserError.builder()
+                                .message("Tài khoản không tồn tại.")
+                                .fields(List.of("token"))
+                                .build()
+                ));
+
+        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+            validateExistingEmail(storeId, request.getEmail());
+            user.setEmail(request.getEmail());
+        }
+
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+
+        if (request.getPermissions() != null) {
+            user.setPermissions(request.getPermissions());
         }
 
         userRepository.save(user);

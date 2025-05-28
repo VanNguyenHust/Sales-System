@@ -19,11 +19,7 @@ public enum Role {
     create_orders,
     update_orders,
     delete_orders,
-    cancel_orders,
-    create_returns,
-    refund_returns,
-    cancel_returns,
-    read_returns;
+    ;
 
     public static List<String> getPermissions() {
         return Stream.of(Role.values())

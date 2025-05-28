@@ -38,7 +38,7 @@ export const LayoutComponent: React.FC = () => {
         collapsed={collapsed}
         onCollapse={setCollapsed}
         breakpoint="lg"
-        collapsedWidth="60"
+        collapsedWidth="50"
         style={{
           position: "fixed",
           left: 0,
@@ -85,7 +85,7 @@ export const LayoutComponent: React.FC = () => {
           style={{
             position: "fixed",
             top: 0,
-            left: collapsed ? 60 : 200,
+            left: collapsed ? 50 : 200,
             right: 0,
             height: "64px",
             background: colorBgContainer,
@@ -111,7 +111,7 @@ export const LayoutComponent: React.FC = () => {
             marginTop: "64px",
             padding: "24px 16px",
             overflowY: "auto",
-            marginLeft: collapsed ? 60 : 0,
+            marginLeft: collapsed ? 50 : 0,
             transition: "margin-left 0.2s",
           }}
         >

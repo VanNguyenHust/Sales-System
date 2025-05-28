@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "MetafieldDefinitions")
+@Table(name = "metafield_definitions")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

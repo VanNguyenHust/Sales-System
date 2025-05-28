@@ -1,12 +1,14 @@
 import React from "react";
-import { DownOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
+import { useSelector } from "react-redux";
+import { StoreInfoState } from "@/client";
 
 export const ProfileMenu: React.FC = () => {
-  // const { contextHolder, openNotification } = useNotification();
-
-  // const [logout, { isLoading }] = useLogoutMutation();
+  const { phoneNumber } = useSelector(
+    (state: StoreInfoState) => state.storeInfo
+  ); // const [logout, { isLoading }] = useLogoutMutation();
 
   const items: MenuProps["items"] = [
     {
@@ -46,11 +48,10 @@ export const ProfileMenu: React.FC = () => {
 
   return (
     <>
-      {/* {contextHolder} */}
       <Dropdown menu={{ items }}>
         <a onClick={(e) => e.preventDefault()}>
           <Space>
-            {localStorage.getItem("fullName")}
+            {phoneNumber}
             <DownOutlined />
           </Space>
         </a>

@@ -20,9 +20,11 @@ public interface JpaMetafieldRepository extends JpaRepository<Metafield, Integer
 
     Metafield findByIdAndStoreId(int id, int storeId);
 
-    @Query("SELECT m.namespace, m.key, m.ownerResource, COUNT(1) " +
+    @Query("SELECT m.namespace, m.key, m.ownerResource, COUNT(m) " +
            "FROM Metafield m " +
            "WHERE m.storeId = ?1 AND m.namespace IN ?2 AND m.key IN ?3 AND m.ownerResource IN ?4 " +
            "GROUP BY m.namespace, m.key, m.ownerResource")
-    Map<String, Integer> filterCountsByNamespaceAndKeyAndOwnerResource(int storeId, List<String> namespaces, List<String> keys, List<String> ownerResources);
+    List<Object[]> filterCountsByNamespaceAndKeyAndOwnerResource(int storeId, List<String> namespaces, List<String> keys, List<String> ownerResources);
+
+    Integer countByStoreIdAndNamespaceAndKeyAndOwnerResource(int storeId, String namespace, String key, String ownerResource);
 }

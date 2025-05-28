@@ -3,18 +3,21 @@ package vn.hust.omni.sale.service.store.application.service;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.hust.omni.sale.lib.address.*;
 import vn.hust.omni.sale.service.store.application.constant.Role;
-import vn.hust.omni.sale.service.store.application.model.location.LocationCreateRequest;
-import vn.hust.omni.sale.service.store.application.model.location.LocationResponse;
-import vn.hust.omni.sale.service.store.application.model.location.LocationUpdateRequest;
+import vn.hust.omni.sale.service.store.application.model.location.*;
 import vn.hust.omni.sale.service.store.application.service.mapper.LocationMapper;
 import vn.hust.omni.sale.service.store.domain.model.Location;
+import vn.hust.omni.sale.service.store.domain.model.Location_;
 import vn.hust.omni.sale.service.store.domain.repository.JpaLocationRepository;
+import vn.hust.omni.sale.service.store.infrastructure.specification.LocationSpecification;
 import vn.hust.omni.sale.service.store.infrastructure.utils.PhoneUtils;
 import vn.hust.omni.sale.shared.ApiClient;
 import vn.hust.omni.sale.shared.common_util.TextUtils;
@@ -22,7 +25,7 @@ import vn.hust.omni.sale.shared.common_validator.exception.ConstraintViolationEx
 import vn.hust.omni.sale.shared.common_validator.exception.NotFoundException;
 import vn.hust.omni.sale.shared.common_validator.exception.UserError;
 
-import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 
 import static vn.hust.omni.sale.service.store.application.constant.Location.LIMIT_LOCATION;
@@ -32,6 +35,7 @@ import static vn.hust.omni.sale.service.store.application.constant.Location.LIMI
 public class LocationService {
     private final JpaLocationRepository locationRepository;
     private final AddressService addressService;
+    private final StoreService storeService;
 
     private final LocationMapper locationMapper;
     private final ApiClient apiClient;
@@ -39,9 +43,20 @@ public class LocationService {
     @Transactional
     public LocationResponse create(int storeId, LocationCreateRequest request) {
         verifyPermissionInternalBasicAuth();
+        var store = storeService.getStoreById(storeId);
         var total = locationRepository.countByStoreIdAndDeletedIsFalse(storeId);
         if (total >= LIMIT_LOCATION)
             throw new ConstraintViolationException("limit_location", "Maximum allowed limit of 500 locations.");
+
+        if (total >= store.getMaxLocation()) {
+            throw new ConstraintViolationException(
+                    UserError.builder()
+                            .message("Số chi nhánh đã đạt tối đa, vui lòng liên hệ quản trị viên để mở thêm")
+                            .fields(List.of("maxLocation"))
+                            .build()
+            );
+        }
+
         var location = Location.builder()
                 .storeId(storeId)
                 .defaultLocation(false)
@@ -90,6 +105,25 @@ public class LocationService {
         var resultLocation = locationRepository.save(location);
 
         return locationMapper.toResponse(resultLocation);
+    }
+
+    public LocationsResponse get(int storeId, FilterLocationsRequest request) {
+        var specification = buildSpecification(storeId, request.getQuery());
+        var pageable = PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Direction.DESC, Location_.CREATED_ON));
+
+        var locations = locationRepository.findAll(specification, pageable);
+
+        return LocationsResponse.builder()
+                .locations(locations.getContent().stream()
+                        .map(locationMapper::toResponse)
+                        .toList())
+                .count(locations.getTotalElements())
+                .build();
+    }
+
+    public LocationResponse getById(int storeId, int id) {
+        var location = locationRepository.findByIdAndStoreId(id, storeId).orElseThrow(NotFoundException::new);
+        return locationMapper.toResponse(location);
     }
 
     private void verifyPermissionInternalBasicAuth() {
@@ -224,5 +258,15 @@ public class LocationService {
         if (!location.isInventoryManagement() || Location.Status.expired.equals(location.getStatus()) ||
             !changeInventoryManagement && !changeStatus)
             return;
+    }
+
+    private Specification<Location> buildSpecification(int storeId, String query) {
+        Specification <Location> specification = Specification.where(LocationSpecification.hasStoreId(storeId));
+
+        if (StringUtils.isNotBlank(query)) {
+            specification = specification.and(LocationSpecification.hasName(query));
+        }
+
+        return specification;
     }
 }

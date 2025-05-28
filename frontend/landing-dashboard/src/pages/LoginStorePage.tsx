@@ -39,11 +39,11 @@ const LoginStorePage: React.FC = () => {
     try {
       const response = await login(values).unwrap();
       window.location.href =
-        "http://localhost:5173/admin?authorize=" + response.token;
+        "http://localhost:5173/admin/authorize?token=" + response.token;
     } catch (error) {
       openNotification({
         type: "error",
-        title: "Đăng ký cửa hàng thất bại",
+        title: "Đăng nhập cửa hàng thất bại",
         description:
           (error as any)?.data?.errors?.[0]?.message ||
           "Đã xảy ra lỗi không xác định",

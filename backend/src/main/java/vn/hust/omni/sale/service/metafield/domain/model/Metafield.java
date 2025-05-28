@@ -10,7 +10,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "Metafields")
+@Table(name = "metafields")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

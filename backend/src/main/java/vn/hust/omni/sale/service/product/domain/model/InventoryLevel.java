@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -32,9 +33,9 @@ public class InventoryLevel {
     @Column(updatable = false)
     private long locationId;
 
-    private long quantity;
+    private BigDecimal quantity;
 
-    private long saleAvailable;
+    private BigDecimal saleAvailable;
 
     @CreationTimestamp
     private Instant createdOn;

@@ -83,13 +83,13 @@ export default function ManageStoreInfo() {
     data: countries,
     isLoading: isLoadingCountries,
     isFetching: isFetchingCountries,
-  } = useGetCountriesQuery();
+  } = useGetCountriesQuery({});
 
   const {
     data: provinces,
     isLoading: isLoadingProvinces,
     isFetching: isFetchingProvinces,
-  } = useGetProvincesQuery();
+  } = useGetProvincesQuery({});
 
   if (
     isLoadingStore ||

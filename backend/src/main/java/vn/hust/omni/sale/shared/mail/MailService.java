@@ -61,13 +61,14 @@ public class MailService {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("recipientName", event.getFullName());
-        properties.put("confirmCode", event.getConfirmCode());
+        properties.put("storeName", event.getStoreName());
+        properties.put("linkConfirm", String.format("http://localhost:5174/confirm_invited?email=%s&confirmCode=%s&storeId=%s", event.getEmail(), event.getConfirmCode(), event.getStoreId()));
         context.setVariables(properties);
 
         helper.setFrom(emailFrom, "HUST - One Love One Future");
         helper.setTo(event.getEmail());
-        helper.setSubject("Mã kích hoạt cửa hàng");
-        String html = templateEngine.process("send-confirm-code-register-store.html", context);
+        helper.setSubject("Xác nhận tham gia quản lý cửa hàng");
+        String html = templateEngine.process("send-confirm-manage-store.html", context);
         helper.setText(html, true);
 
         mailSender.send(message);

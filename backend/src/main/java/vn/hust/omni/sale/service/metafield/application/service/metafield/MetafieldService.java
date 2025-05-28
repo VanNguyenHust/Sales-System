@@ -33,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -53,8 +54,12 @@ public class MetafieldService {
     }
 
     public Map<String, Integer> filterCountsByNamespaceAndKeyAndOwnerResource(int storeId, List<String> namespaces, List<String> keys, List<String> ownerResources) {
-        return metafieldRepository.filterCountsByNamespaceAndKeyAndOwnerResource(storeId, namespaces, keys, ownerResources);
-    }
+        List<Object[]> rows = metafieldRepository.filterCountsByNamespaceAndKeyAndOwnerResource(storeId, namespaces, keys, ownerResources);
+
+        return rows.stream().collect(Collectors.toMap(
+                row -> row[0] + ":" + row[1] + ":" + row[2],
+                row -> ((Long) row[3]).intValue()
+        ));    }
 
     public void removeByDefinition(int storeId, MetafieldDefinitionOwnerType ownerResource, String namespace, String key) {
         metafieldRepository.deleteByDefinition(storeId, ownerResource.name(), namespace, key);
@@ -111,6 +116,10 @@ public class MetafieldService {
         }
         metafieldRepository.saveAll(metafieldsResponse);
         return metafieldsResponse.stream().map(metafieldMapper::toResponse).toList();
+    }
+
+    public int filterCountByNamespaceAndKeyAndOwnerResource(int storeId, String namespace, String key, MetafieldDefinitionOwnerType ownerResource) {
+        return metafieldRepository.countByStoreIdAndNamespaceAndKeyAndOwnerResource(storeId, namespace, key, ownerResource.name());
     }
 
     private MetafieldRequest convertMetafieldSetToRequest(MetafieldSet set) {

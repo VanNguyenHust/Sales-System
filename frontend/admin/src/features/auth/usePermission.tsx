@@ -1,9 +1,8 @@
 import { useCallback } from "react";
 
-import { Permission } from "src/constants";
-import { useSelector } from "src/types";
-
 import { hasSomePermissions as hasPermissions } from "./utils";
+import { Permission } from "@/constants";
+import { useSelector } from "react-redux";
 
 type UserPermissionReturn = {
   /**

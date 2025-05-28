@@ -12,6 +12,14 @@ public class ProductSpecification {
         return (root, query, cb) -> cb.equal(root.get(Product_.STORE_ID), storeId);
     }
 
+    public static Specification<Product> hasAlias(String alias) {
+        return (root, query, cb) -> cb.equal(cb.lower(root.get(Product_.ALIAS)), alias.toLowerCase());
+    }
+
+    public static Specification<Product> hasName(String name) {
+        return (root, query, cb) -> cb.like(cb.lower(root.get(Product_.NAME)), "%" + name.toLowerCase() + "%");
+    }
+
     public static Specification<Product> hasProductIds(List<Integer> productIds) {
         return (root, query, cb) -> root.get(Product_.ID).in(productIds);
     }

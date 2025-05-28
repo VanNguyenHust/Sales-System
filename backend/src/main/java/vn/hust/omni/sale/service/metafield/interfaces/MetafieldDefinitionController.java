@@ -9,6 +9,7 @@ import vn.hust.omni.sale.service.metafield.application.service.definition.Metafi
 import vn.hust.omni.sale.service.metafield.domain.model.MetafieldDefinitionOwnerType;
 import vn.hust.omni.sale.service.store.application.constant.StoreFeatures;
 import vn.hust.omni.sale.service.store.application.service.StoreFeatureService;
+import vn.hust.omni.sale.shared.common_model.CountResponse;
 import vn.hust.omni.sale.shared.common_validator.exception.ConstraintViolationException;
 import vn.hust.omni.sale.shared.common_validator.exception.UserError;
 import vn.hust.omni.sale.shared.security.StoreId;
@@ -62,6 +63,28 @@ public class MetafieldDefinitionController {
         metafieldDefinitionService.remove(storeId, id, deleteAllAssociatedMetafields);
     }
 
+    @GetMapping
+    public List<MetafieldDefinitionResponse> filter(
+            @StoreId int storeId, @Valid MetafieldDefinitionFilterRequest request) {
+        checkFeatureAccessMetafieldDefinition(storeId);
+
+        return metafieldDefinitionService.enrichMetafieldDataCount(storeId, metafieldDefinitionService.filter(storeId, request));
+    }
+
+    @GetMapping("{id}")
+    public MetafieldDefinitionResponse getById(@StoreId int storeId, @PathVariable("id") int id) {
+        checkFeatureAccessMetafieldDefinition(storeId);
+
+        return metafieldDefinitionService.getById(storeId, id, true);
+    }
+
+    @GetMapping("/count")
+    public CountResponse count(@StoreId int storeId, @Valid MetafieldDefinitionFilterRequest request) {
+        checkFeatureAccessMetafieldDefinition(storeId);
+
+        return metafieldDefinitionService.count(storeId, request);
+    }
+
     @GetMapping("/applied_for_upsert")
     public List<AppliedMetafieldDefinitions> appliedMetafieldDefinitionsForEdit(
             @StoreId int storeId, @Valid MetafieldDefinitionFilterRequest request) {
@@ -78,5 +101,12 @@ public class MetafieldDefinitionController {
         checkFeatureAccessMetafieldDefinition(storeId);
 
         return metafieldDefinitionService.metafieldFilterValues(storeId, ownerResource);
+    }
+
+    @GetMapping("/count_by_resource")
+    public List<MetafieldDefinitionCountResponse> countByResource(@StoreId int storeId) {
+        checkFeatureAccessMetafieldDefinition(storeId);
+
+        return metafieldDefinitionService.countByResource(storeId);
     }
 }
